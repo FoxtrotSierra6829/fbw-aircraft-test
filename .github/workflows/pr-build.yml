@@ -87,6 +87,7 @@ jobs:
       - name: Install dependencies
         run: |
           ./scripts/dev-env/run.sh ./scripts/setup.sh --clean
+          sudo apt-get install -y rclone
       - name: Build A32NX
         run: |
           ./scripts/dev-env/run.sh ./scripts/build_a32nx.sh --no-tty -j 4
