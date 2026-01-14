@@ -8,32 +8,31 @@ const path = require('path');
 const PR_NUMBER = process.env.PR_NUMBER || 'unknown';
 const QA_CONFIG_URL = process.env.QA_CONFIG_URL || 'https://flybywirecdn.com/installer/qa-config/pull-requests.json';
 const PUBLISHER_KEY = process.env.PUBLISHER_KEY || 'flybywiresim';
-const ADDON_KEYS = process.env.ADDON_KEYS ? process.env.ADDON_KEYS.split(',') : [
-  'a32nx-msfs2020',
-  'a32nx-msfs2024',
-  'a380x-msfs2020',
-  'a380x-msfs2024'
-];
+const ADDON_KEYS = process.env.ADDON_KEYS
+  ? process.env.ADDON_KEYS.split(',')
+  : ['a32nx-msfs2020', 'a32nx-msfs2024', 'a380x-msfs2020', 'a380x-msfs2024'];
 
 function fetchUrl(url) {
   return new Promise((resolve, reject) => {
-    https.get(url, (response) => {
-      let data = '';
+    https
+      .get(url, (response) => {
+        let data = '';
 
-      response.on('data', (chunk) => {
-        data += chunk;
-      });
+        response.on('data', (chunk) => {
+          data += chunk;
+        });
 
-      response.on('end', () => {
-        if (response.statusCode === 200) {
-          resolve(data);
-        } else {
-          reject(new Error(`HTTP ${response.statusCode}: ${data}`));
-        }
+        response.on('end', () => {
+          if (response.statusCode === 200) {
+            resolve(data);
+          } else {
+            reject(new Error(`HTTP ${response.statusCode}: ${data}`));
+          }
+        });
+      })
+      .on('error', (error) => {
+        reject(error);
       });
-    }).on('error', (error) => {
-      reject(error);
-    });
   });
 }
 
@@ -47,7 +46,7 @@ function removeTracksForPr(addon, prNumber) {
     trackKeysToRemove.push(`a380x-pr-${prNumber}-4k`, `a380x-pr-${prNumber}-8k`);
   }
 
-  addon.tracks = addon.tracks.filter(track => !trackKeysToRemove.includes(track.key));
+  addon.tracks = addon.tracks.filter((track) => !trackKeysToRemove.includes(track.key));
 
   const removedCount = initialLength - addon.tracks.length;
   if (removedCount > 0) {
@@ -60,7 +59,7 @@ function removeTracksForPr(addon, prNumber) {
 
 function cleanupEmptyAddons(publisher) {
   const initialLength = publisher.addons.length;
-  publisher.addons = publisher.addons.filter(addon => addon.tracks.length > 0);
+  publisher.addons = publisher.addons.filter((addon) => addon.tracks.length > 0);
 
   const removedCount = initialLength - publisher.addons.length;
   if (removedCount > 0) {
@@ -70,7 +69,7 @@ function cleanupEmptyAddons(publisher) {
 
 function cleanupEmptyPublishers(config) {
   const initialLength = config.publishers.length;
-  config.publishers = config.publishers.filter(publisher => publisher.addons.length > 0);
+  config.publishers = config.publishers.filter((publisher) => publisher.addons.length > 0);
 
   const removedCount = initialLength - config.publishers.length;
   if (removedCount > 0) {
@@ -98,7 +97,7 @@ async function main() {
 
     let removedAnyTracks = false;
 
-    const publisher = config.publishers.find(p => p.key === PUBLISHER_KEY);
+    const publisher = config.publishers.find((p) => p.key === PUBLISHER_KEY);
     if (!publisher) {
       console.log(`Publisher '${PUBLISHER_KEY}' not found, nothing to remove.`);
       return;
@@ -107,7 +106,7 @@ async function main() {
     for (const addonKey of ADDON_KEYS) {
       console.log(`Processing addon: ${addonKey}`);
 
-      const addon = publisher.addons.find(a => a.key === addonKey);
+      const addon = publisher.addons.find((a) => a.key === addonKey);
       if (!addon) {
         console.log(`Addon '${addonKey}' not found, skipping.`);
         continue;
@@ -134,14 +133,13 @@ async function main() {
     console.log(`Updated config saved to: ${outputPath}`);
 
     console.log('\nSuccessfully removed QA configuration entries');
-
   } catch (error) {
     console.error('Error removing QA config:', error.message);
     process.exit(1);
   }
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error('Script failed:', error);
   process.exit(1);
 });
