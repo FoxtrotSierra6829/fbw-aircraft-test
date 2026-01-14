@@ -103,7 +103,6 @@ function addOrUpdateTrack(addon, track) {
   }
 }
 
-
 function cacheKiller(url) {
   return `${url}?t=${Date.now()}`;
 }
