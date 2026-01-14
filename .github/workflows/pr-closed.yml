@@ -52,7 +52,7 @@ jobs:
           ADDON_KEYS: a32nx-msfs2020,a32nx-msfs2024,a380x-msfs2020,a380x-msfs2024
           CLOUDFLARE_CDN_ZONE_ID: ${{ secrets.CLOUDFLARE_CDN_ZONE_ID }}
           CLOUDFLARE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
-          CDN_BUCKET_DESTINATION: installer/qa-config/
+          CDN_BUCKET_DESTINATION: installer/qa-config
         run: |
           node ./scripts/remove_qa_config.js
           ./scripts/cf-cdn.sh ./qa-config $CDN_BUCKET_DESTINATION
