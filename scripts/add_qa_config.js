@@ -40,8 +40,10 @@ function fetchUrl(url) {
 }
 
 function createTrack(addonKey, prNumber, prTitle, prBody, textureQuality) {
-  const trackKey = `${addonKey.split('-')[0]}-pr-${prNumber}${addonKey.startsWith('a380x') ? `-${textureQuality}` : ''}`;
-  const trackName = `PR #${prNumber} | ${prTitle}`;
+  const addonPrefix = addonKey.split('-')[0];
+  const textureQualitySuffix = addonKey.startsWith('a380x') ? `-${textureQuality}` : '';
+  const trackKey = `${addonPrefix}-pr-${prNumber}${textureQualitySuffix}`;
+  const trackName = `PR #${prNumber} ${addonKey.startsWith('a380x') ? `(${textureQuality.toUpperCase()})` : ''} | ${prTitle}`;
   const description = `## [${prTitle} #${prNumber}](https://github.com/${GITHUB_REPO}/pull/${prNumber})\n\n${prBody}`;
 
   let baseUrl;
@@ -146,7 +148,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
+try {
+  await main();
+} catch (error) {
   console.error('Script failed:', error);
   process.exit(1);
-});
+}
