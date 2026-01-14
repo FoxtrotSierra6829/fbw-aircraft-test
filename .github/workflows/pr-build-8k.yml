@@ -144,4 +144,4 @@ jobs:
           CDN_BUCKET_DESTINATION: installer/qa-config/
         run: |
           node ./scripts/add_qa_config.js
-          ./scripts/cf-cdn.sh ./fbw-common/out/qa-config $CDN_BUCKET_DESTINATION
+          ./scripts/cf-cdn.sh ./qa-config $CDN_BUCKET_DESTINATION
