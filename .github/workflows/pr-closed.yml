@@ -5,6 +5,23 @@ on:
       - closed
 
 jobs:
+  cancel:
+    name: Cancel other workflows
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Cancel PR build
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          ignore_sha: true
+          workflow_id: "pr-build.yml"
+
+      - name: Cancel PR build (8K)
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          ignore_sha: true
+          workflow_id: "pr-build-8k.yml"
   remove-from-qa-config:
     name: Remove PR from QA Config
     runs-on: ubuntu-latest
