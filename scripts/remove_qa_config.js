@@ -77,14 +77,18 @@ function cleanupEmptyPublishers(config) {
   }
 }
 
+function cacheKiller(url) {
+  return `${url}?t=${Date.now()}`;
+}
+
 async function main() {
   try {
     console.log(`Removing QA config entries for PR #${PR_NUMBER}`);
-    console.log(`Fetching QA config from: ${QA_CONFIG_URL}`);
+    console.log(`Fetching QA config from: ${cacheKiller(QA_CONFIG_URL)}`);
 
     let config;
     try {
-      const configData = await fetchUrl(QA_CONFIG_URL);
+      const configData = await fetchUrl(cacheKiller(QA_CONFIG_URL));
       config = JSON.parse(configData);
     } catch (error) {
       if (error.message.includes('HTTP 404')) {
@@ -117,11 +121,6 @@ async function main() {
       }
     }
 
-    if (!removedAnyTracks) {
-      console.log('No tracks found to remove.');
-      return;
-    }
-
     cleanupEmptyAddons(publisher);
     cleanupEmptyPublishers(config);
 
@@ -132,6 +131,10 @@ async function main() {
     fs.writeFileSync(outputPath, updatedConfigJson, 'utf8');
     console.log(`Updated config saved to: ${outputPath}`);
 
+    if (!removedAnyTracks) {
+      console.log('No tracks found to remove.');
+      return;
+    }
     console.log('\nSuccessfully removed QA configuration entries');
   } catch (error) {
     console.error('Error removing QA config:', error.message);
