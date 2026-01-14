@@ -4,8 +4,6 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-
-// Get PR information from environment variables or GitHub context
 const PR_NUMBER = process.env.PR_NUMBER || 'unknown';
 const PR_TITLE = process.env.PR_TITLE || 'Untitled PR';
 const PR_BODY = process.env.PR_BODY || 'No description provided.';
@@ -13,32 +11,31 @@ const TEXTURE_QUALITY = process.env.TEXTURE_QUALITY || '4k';
 const GITHUB_REPO = process.env.GITHUB_REPO || 'flybywiresim/aircraft';
 const QA_CONFIG_URL = process.env.QA_CONFIG_URL || 'https://flybywirecdn.com/installer/qa-config/pull-requests.json';
 const PUBLISHER_KEY = process.env.PUBLISHER_KEY || 'flybywiresim';
-const ADDON_KEYS = process.env.ADDON_KEYS ? process.env.ADDON_KEYS.split(',') : [
-  'a32nx-msfs2020',
-  'a32nx-msfs2024',
-  'a380x-msfs2020',
-  'a380x-msfs2024'
-];
+const ADDON_KEYS = process.env.ADDON_KEYS
+  ? process.env.ADDON_KEYS.split(',')
+  : ['a32nx-msfs2020', 'a32nx-msfs2024', 'a380x-msfs2020', 'a380x-msfs2024'];
 
 function fetchUrl(url) {
   return new Promise((resolve, reject) => {
-    https.get(url, (response) => {
-      let data = '';
+    https
+      .get(url, (response) => {
+        let data = '';
 
-      response.on('data', (chunk) => {
-        data += chunk;
-      });
+        response.on('data', (chunk) => {
+          data += chunk;
+        });
 
-      response.on('end', () => {
-        if (response.statusCode === 200) {
-          resolve(data);
-        } else {
-          reject(new Error(`HTTP ${response.statusCode}: ${data}`));
-        }
+        response.on('end', () => {
+          if (response.statusCode === 200) {
+            resolve(data);
+          } else {
+            reject(new Error(`HTTP ${response.statusCode}: ${data}`));
+          }
+        });
+      })
+      .on('error', (error) => {
+        reject(error);
       });
-    }).on('error', (error) => {
-      reject(error);
-    });
   });
 }
 
@@ -48,11 +45,11 @@ function createTrack(addonKey, prNumber, prTitle, prBody, textureQuality) {
   const description = `## [${prTitle} #${prNumber}](https://github.com/${GITHUB_REPO}/pull/${prNumber})\n\n${prBody}`;
 
   let baseUrl;
-    if (addonKey.startsWith('a32nx')) {
-        baseUrl = `https://flybywirecdn.com/addons/a32nx/pr-${prNumber}`;
-    } else if (addonKey.startsWith('a380x')) {
-        baseUrl = `https://flybywirecdn.com/addons/a380x/pr-${prNumber}-${textureQuality}`;
-    }
+  if (addonKey.startsWith('a32nx')) {
+    baseUrl = `https://flybywirecdn.com/addons/a32nx/pr-${prNumber}`;
+  } else if (addonKey.startsWith('a380x')) {
+    baseUrl = `https://flybywirecdn.com/addons/a380x/pr-${prNumber}-${textureQuality}`;
+  }
 
   return {
     name: trackName,
@@ -60,17 +57,17 @@ function createTrack(addonKey, prNumber, prTitle, prBody, textureQuality) {
     url: baseUrl,
     description: description,
     isQualityAssurance: true,
-    releaseModel: { type: 'fragmenter' }
+    releaseModel: { type: 'fragmenter' },
   };
 }
 
 function findOrCreatePublisher(config, publisherKey) {
-  let publisher = config.publishers.find(p => p.key === publisherKey);
+  let publisher = config.publishers.find((p) => p.key === publisherKey);
 
   if (!publisher) {
     publisher = {
       key: publisherKey,
-      addons: []
+      addons: [],
     };
     config.publishers.push(publisher);
   }
@@ -79,12 +76,12 @@ function findOrCreatePublisher(config, publisherKey) {
 }
 
 function findOrCreateAddon(publisher, addonKey) {
-  let addon = publisher.addons.find(a => a.key === addonKey);
+  let addon = publisher.addons.find((a) => a.key === addonKey);
 
   if (!addon) {
     addon = {
       key: addonKey,
-      tracks: []
+      tracks: [],
     };
     publisher.addons.push(addon);
   }
@@ -92,9 +89,8 @@ function findOrCreateAddon(publisher, addonKey) {
   return addon;
 }
 
-
 function addOrUpdateTrack(addon, track) {
-  const existingTrackIndex = addon.tracks.findIndex(t => t.key === track.key);
+  const existingTrackIndex = addon.tracks.findIndex((t) => t.key === track.key);
 
   if (existingTrackIndex >= 0) {
     addon.tracks[existingTrackIndex] = track;
@@ -119,7 +115,7 @@ async function main() {
         console.log('Config not found, re-creating new config.');
         config = {
           version: 1,
-          publishers: []
+          publishers: [],
         };
       } else {
         throw error;
@@ -143,16 +139,14 @@ async function main() {
     fs.mkdirSync(path.dirname(outputPath), { recursive: true });
     fs.writeFileSync(outputPath, updatedConfigJson, 'utf8');
     console.log(`Updated config saved to: ${outputPath}`);
-
     console.log('\nSuccessfully updated QA configuration');
-
   } catch (error) {
     console.error('Error updating QA config:', error.message);
     process.exit(1);
   }
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error('Script failed:', error);
   process.exit(1);
 });
