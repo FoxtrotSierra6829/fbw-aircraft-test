@@ -2,7 +2,7 @@ name: PR Updated
 on:
   pull_request_target:
     types:
-      - closed
+      - edited
 
 jobs:
   update-qa-config:
