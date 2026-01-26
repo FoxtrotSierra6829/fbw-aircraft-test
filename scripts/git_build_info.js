@@ -62,17 +62,18 @@ exports.getGitBuildInfo = () => {
     } catch (e) {
       console.log('No tag', e);
     }
-    let branch;
-    let commitHash;
+
     const isPullRequest =
       process.env.GITHUB_EVENT_NAME === 'pull_request' || process.env.GITHUB_EVENT_NAME === 'pull_request_target';
+
+    let branch;
+    let commitHash;
     if (isPullRequest) {
       const prInfo = getPullRequestInfo();
       commitHash = prInfo.headSha;
       branch = prInfo.headRef;
     } else {
       commitHash = process.env.GITHUB_SHA ? process.env.GITHUB_SHA : evaluate('git show-ref -s HEAD');
-
       branch = process.env.GITHUB_REF_NAME ? process.env.GITHUB_REF_NAME : evaluate('git rev-parse --abbrev-ref HEAD');
     }
 
