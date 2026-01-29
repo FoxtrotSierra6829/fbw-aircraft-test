@@ -10,12 +10,15 @@ on:
 jobs:
   lint:
     name: Lint
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
       - name: Checkout PR source
         uses: actions/checkout@v4
         with:
+          persist-credentials: false
           ref: refs/pull/${{ github.event.pull_request.number }}/head
       - name: install
         run: ./scripts/dev-env/run.sh ./scripts/setup.sh --clean
@@ -26,24 +29,30 @@ jobs:
           ./scripts/dev-env/run.sh scripts/lint-rust.sh
   test-rust:
     name: Tests (Rust)
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
       - name: Checkout PR source
         uses: actions/checkout@v4
         with:
+          persist-credentials: false
           ref: refs/pull/${{ github.event.pull_request.number }}/head
       - name: test-rust.sh
         run: |
           ./scripts/dev-env/run.sh scripts/test-rust.sh
   test-js:
     name: Tests (JS)
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
       - name: Checkout PR source
         uses: actions/checkout@v4
         with:
+          persist-credentials: false
           ref: refs/pull/${{ github.event.pull_request.number }}/head
       - name: npm install
         run: ./scripts/dev-env/run.sh ./scripts/setup.sh --clean
@@ -51,6 +60,9 @@ jobs:
         run: npm test
   build-a32nx:
     name: Build and upload A32NX
+    permissions:
+      contents: read
+      actions: write
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     env:
@@ -70,6 +82,7 @@ jobs:
       - name: Checkout PR source
         uses: actions/checkout@v4
         with:
+          persist-credentials: false
           ref: refs/pull/${{ github.event.pull_request.number }}/head
           submodules: recursive
       - name: Create .env file
@@ -121,8 +134,10 @@ jobs:
       - name: Checkout trusted source
         uses: actions/checkout@v4
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.base.ref }}
       - name: Configure rclone for Cloudflare R2
+        if: github.event.pull_request.auto_merge == false
         run: |
             mkdir -p ~/.config/rclone
             cat > ~/.config/rclone/rclone.conf <<EOF
@@ -136,6 +151,7 @@ jobs:
             region = auto
             EOF
       - name: Upload to CloudFlare CDN (Installer)
+        if: github.event.pull_request.auto_merge == false
         env:
           CLOUDFLARE_CDN_ZONE_ID: ${{ secrets.CLOUDFLARE_CDN_ZONE_ID }}
           CLOUDFLARE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
@@ -159,6 +175,9 @@ jobs:
 
   build_a380x_4k:
     name: Build and upload A380X (4K)
+    permissions:
+      contents: read
+      actions: write
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     env:
@@ -199,6 +218,7 @@ jobs:
       - name: Checkout PR source
         uses: actions/checkout@v4
         with:
+          persist-credentials: false
           ref: refs/pull/${{ github.event.pull_request.number }}/head
           submodules: recursive
       - name: Set BUILT_DATE_TIME
@@ -254,6 +274,7 @@ jobs:
       - name: Checkout trusted source
         uses: actions/checkout@v4
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.base.ref }}
       - name: Configure rclone for Cloudflare R2
         if: github.event.pull_request.auto_merge == false
