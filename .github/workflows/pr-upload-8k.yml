@@ -61,9 +61,7 @@ jobs:
           ref: ${{ github.event.repository.default_branch }}
       - name: Download PR artifacts
         uses: actions/download-artifact@v5
-        id: preview-build-artifact
         with:
-          name: preview-build
           pattern: build-modules-*
           path: /tmp/artifacts/
           github-token: ${{ secrets.GITHUB_TOKEN }}
