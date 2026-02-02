@@ -1,6 +1,8 @@
 name: PR Tests & Build
 on:
   pull_request_target:
+    branches:
+      - quality-assurance-installer
     types:
       - opened
       - synchronize
