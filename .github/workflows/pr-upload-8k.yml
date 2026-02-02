@@ -96,7 +96,7 @@ jobs:
           CLOUDFLARE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
           CDN_BUCKET_DESTINATION: addons/a380x/pr-${{ steps.pr.outputs.number }}
         run: |
-          ./scripts/cf-cdn.sh /tmp/build-modules-a380x $CDN_BUCKET_DESTINATION
+          ./scripts/cf-cdn.sh /tmp/artifacts/build-modules-a380x-8k $CDN_BUCKET_DESTINATION
       - name: Add QA config entry
         if: steps.artifacts.outputs.found == 'true'
         env:
