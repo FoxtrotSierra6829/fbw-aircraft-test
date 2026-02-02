@@ -13,6 +13,7 @@ jobs:
     permissions:
       contents: read
       actions: read
+      pull-requests: read
     steps:
       - name: Maximize space
         uses: AdityaGarg8/remove-unwanted-software@v4.1
@@ -28,12 +29,13 @@ jobs:
           sudo apt-get install -y rclone
       - name: Get PR info for triggering commit
         id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           SHA="${{ github.event.workflow_run.head_commit.id }}"
 
           PR_JSON=$(gh api \
             repos/${{ github.repository }}/commits/$SHA/pulls \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             --jq '.[0]')
 
           if [ "$PR_JSON" = "null" ]; then
