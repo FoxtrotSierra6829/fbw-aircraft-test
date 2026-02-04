@@ -109,3 +109,14 @@ jobs:
           name: build-modules-a380x-8k
           path: ./fbw-a380x/out/build-modules/
           retention-days: 1
+      - name: Save PR metadata
+        run: |
+          jq -n \
+            --argjson pr '${{ toJson(github.event.pull_request) }}' \
+            '$pr' > pr.json
+      - name: Upload PR metadata as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-metadata
+          path: pr.json
+          retention-days: 1
