@@ -31,6 +31,7 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           name: pr-metadata
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
       - name: Load PR info
         id: pr
