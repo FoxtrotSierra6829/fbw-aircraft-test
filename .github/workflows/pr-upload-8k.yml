@@ -27,24 +27,22 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get install -y rclone
-      - name: Get PR info for triggering commit
+      - name: Download PR metadata
+        uses: actions/download-artifact@v5
+        with:
+          name: pr-metadata
+          run-id: ${{ github.event.workflow_run.id }}
+      - name: Load PR info
         id: pr
         run: |
-          PRS='${{ toJson(github.event.workflow_run.pull_requests) }}'
-
-          if [ "$PRS" = "[]" ]; then
-            echo "No pull request found for this workflow run"
-            exit 1
-          fi
-
-          PR_NUMBER=$(echo "$PRS" | jq -r '.[0].number')
-          PR_TITLE=$(echo "$PRS" | jq -r '.[0].title')
-          PR_BODY=$(echo "$PRS" | jq -r '.[0].body // ""')
+          PR_NUMBER=$(jq -r '.number' pr.json)
+          PR_TITLE=$(jq -r '.title' pr.json)
+          PR_BODY=$(jq -r '.body // ""' pr.json)
 
           {
             echo "number=$PR_NUMBER"
             echo "title=$PR_TITLE"
-            echo "body<<EOF"
+            echo "body<<'EOF'"
             echo "$PR_BODY"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
