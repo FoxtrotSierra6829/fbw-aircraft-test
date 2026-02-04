@@ -43,7 +43,7 @@ jobs:
           {
             echo "number=$PR_NUMBER"
             echo "title=$PR_TITLE"
-            echo "body<<'EOF'"
+            echo "body<<EOF"
             echo "$PR_BODY"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
