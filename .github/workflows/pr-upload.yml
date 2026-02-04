@@ -28,18 +28,24 @@ jobs:
         run: |
           sudo apt-get install -y rclone
       - name: Get PR info for triggering commit
-        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          PRS='${{ toJson(github.event.workflow_run.pull_requests) }}'
+          SHA="${{ github.event.workflow_run.head_sha }}"
+          REPO="${{ github.repository }}"
 
-          if [ "$PRS" = "[]" ]; then
-            echo "No pull request found for this workflow run"
+          PR_JSON=$(gh api search/issues \
+            -f q="repo:$REPO type:pr $SHA" \
+            --jq '.items[0]')
+
+          if [ -z "$PR_JSON" ] || [ "$PR_JSON" = "null" ]; then
+            echo "No PR found for workflow_run with head SHA $SHA"
             exit 1
           fi
 
-          PR_NUMBER=$(echo "$PRS" | jq -r '.[0].number')
-          PR_TITLE=$(echo "$PRS" | jq -r '.[0].title')
-          PR_BODY=$(echo "$PRS" | jq -r '.[0].body // ""')
+          PR_NUMBER=$(echo "$PR_JSON" | jq -r '.number')
+          PR_TITLE=$(echo "$PR_JSON" | jq -r '.title')
+          PR_BODY=$(echo "$PR_JSON" | jq -r '.body // ""')
 
           {
             echo "number=$PR_NUMBER"
