@@ -43,4 +43,9 @@ jobs:
           CDN_BUCKET_DESTINATION: installer/qa-config/
         run: |
           node ./scripts/update_qa_config.js
+          UPDATE_RESULT=$?
+          if [ "$UPDATE_RESULT" -eq 2 ]; then
+            echo "No PR tracks updated, skipping CDN upload."
+            exit 0
+          fi
           ./scripts/cf-cdn.sh ./qa-config $CDN_BUCKET_DESTINATION
