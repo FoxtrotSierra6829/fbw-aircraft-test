@@ -105,7 +105,7 @@ async function main() {
 
     if (!updatedAnyTracks) {
       console.log('No existing tracks found to update.');
-      return;
+      process.exit(2);
     }
 
     const updatedConfigJson = JSON.stringify(config, null, 2);
