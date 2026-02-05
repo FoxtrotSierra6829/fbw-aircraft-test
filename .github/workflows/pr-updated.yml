@@ -32,6 +32,7 @@ jobs:
             region = auto
             EOF
       - name: Update QA config entries
+        id: update_config
         if: github.event.pull_request.auto_merge == false
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -41,11 +42,7 @@ jobs:
           CLOUDFLARE_CDN_ZONE_ID: ${{ secrets.CLOUDFLARE_CDN_ZONE_ID }}
           CLOUDFLARE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
           CDN_BUCKET_DESTINATION: installer/qa-config/
-        run: |
-          node ./scripts/update_qa_config.js
-          UPDATE_RESULT=$?
-          if [ "$UPDATE_RESULT" -eq 2 ]; then
-            echo "No PR tracks updated, skipping CDN upload."
-            exit 0
-          fi
-          ./scripts/cf-cdn.sh ./qa-config $CDN_BUCKET_DESTINATION
+        run: node ./scripts/update_qa_config.js
+      - name: Upload QA config to CDN
+        if: steps.update_config.outputs.tracks-updated == 'true'
+        run: ./scripts/cf-cdn.sh ./qa-config $CDN_BUCKET_DESTINATION
