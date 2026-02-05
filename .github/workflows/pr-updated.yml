@@ -39,10 +39,11 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body }}
           ADDON_KEYS: a32nx-msfs2020,a32nx-msfs2024,a380x-msfs2020,a380x-msfs2024
-          CLOUDFLARE_CDN_ZONE_ID: ${{ secrets.CLOUDFLARE_CDN_ZONE_ID }}
-          CLOUDFLARE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
-          CDN_BUCKET_DESTINATION: installer/qa-config/
         run: node ./scripts/update_qa_config.js
       - name: Upload QA config to CDN
         if: steps.update_config.outputs.tracks-updated == 'true'
+        env:
+          CLOUDFLARE_CDN_ZONE_ID: ${{ secrets.CLOUDFLARE_CDN_ZONE_ID }}
+          CLOUDFLARE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
+          CDN_BUCKET_DESTINATION: installer/qa-config/
         run: ./scripts/cf-cdn.sh ./qa-config $CDN_BUCKET_DESTINATION
