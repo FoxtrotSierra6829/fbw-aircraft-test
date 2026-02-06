@@ -91,7 +91,7 @@ jobs:
         run: |
           ./scripts/cf-cdn.sh /tmp/artifacts/build-modules-a380x-8k $CDN_BUCKET_DESTINATION
       - name: Lock QA config
-        run: ./scripts/acquire_lock.sh installer/qa-config/.lock
+        run: bash ./scripts/acquire_lock.sh installer/qa-config/.lock
       - name: Add QA config entry
         if: steps.artifacts.outputs.found == 'true'
         env:
@@ -110,4 +110,4 @@ jobs:
         if: always()
         run: |
           sleep 10
-          ./scripts/release_lock.sh installer/qa-config/.lock
+          bash ./scripts/release_lock.sh installer/qa-config/.lock
