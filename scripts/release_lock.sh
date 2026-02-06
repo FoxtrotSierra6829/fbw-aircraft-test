@@ -6,7 +6,10 @@ R2_BUCKET="flybywiresim"
 LOCK="${1:-locks/test/.lock}"
 
 OWNER="${GITHUB_RUN_ID:-local}-${GITHUB_JOB:-local}"
-LOCK_PATH="$RCLONE_REMOTE:$R2_BUCKET/$LOCK"
+
+DIR="$(dirname "$LOCK")"
+FILE="$(basename "$LOCK")"
+LOCK_PATH="$RCLONE_REMOTE:$R2_BUCKET/$DIR/$FILE"
 
 echo "🔓 Attempting to release lock..."
 
