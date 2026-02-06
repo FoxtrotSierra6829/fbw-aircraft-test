@@ -50,6 +50,7 @@ jobs:
           CDN_BUCKET_DESTINATION: installer/qa-config/
         run: ./scripts/cf-cdn.sh ./qa-config $CDN_BUCKET_DESTINATION
       - name: Release QA config lock
+        if: always()
         run: |
           sleep 10
           ./scripts/release_lock.sh installer/qa-config/.lock
