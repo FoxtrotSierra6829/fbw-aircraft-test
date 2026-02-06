@@ -11,29 +11,28 @@ STALE=3600
 SLEEP=10
 START=$(date +%s)
 
-DIR="$(dirname "$LOCK")"
-FILE="$(basename "$LOCK")"
-DIR_PATH="$RCLONE_REMOTE:$R2_BUCKET/$DIR"
-LOCK_PATH="$DIR_PATH/$FILE"
+LOCK_PATH="$RCLONE_REMOTE:$R2_BUCKET/$LOCK"
 
 echo "🔐 Attempting to acquire lock at '$LOCK_PATH'..."
 
 while true; do
-    # 1. LIST DIRECTORY CONTENTS
-    if ! rclone lsjson "$DIR_PATH" | jq -e ".[] | select(.Name == \"$FILE\")" >/dev/null; then
-        # 2. FILE NOT PRESENT → CREATE
+    # 1. Does the lock object exist?
+    if ! rclone lsjson "$LOCK_PATH" >/dev/null 2>&1; then
+        # 2. No → create it
         echo "$OWNER $(date +%s)" | rclone rcat "$LOCK_PATH"
         echo "✅ Lock acquired"
         exit 0
     fi
 
-    # 3. FILE PRESENT → READ IT
+    # 3. Exists → read it
     CONTENT="$(rclone cat "$LOCK_PATH" 2>/dev/null || true)"
     LOCK_OWNER="$(awk '{print $1}' <<< "$CONTENT")"
     LOCK_TIME="$(awk '{print $2}' <<< "$CONTENT")"
 
-    # 4. IF TIMESTAMP VALID → CHECK STALE
-    if [[ "$LOCK_TIME" =~ ^[0-9]+$ ]]; then
+    # 4. If unreadable or malformed → treat as active, do NOT delete
+    if ! [[ "$LOCK_TIME" =~ ^[0-9]+$ ]]; then
+        echo "🔒 Lock exists but unreadable, waiting..."
+    else
         NOW=$(date +%s)
         AGE=$((NOW - LOCK_TIME))
 
@@ -41,12 +40,9 @@ while true; do
             echo "⚠️ Stale lock (age $AGE s), deleting..."
             rclone delete "$LOCK_PATH" || true
             continue
+        else
+            echo "🔒 Lock held by $LOCK_OWNER (age $AGE s), waiting..."
         fi
-
-        echo "🔒 Lock held by $LOCK_OWNER (age $AGE s), waiting..."
-    else
-        # 5. FILE EXISTS BUT CONTENT BAD → TREAT AS ACTIVE
-        echo "🔒 Lock exists, waiting..."
     fi
 
     if (( $(date +%s) - START > MAX_WAIT )); then
