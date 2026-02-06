@@ -32,7 +32,7 @@ jobs:
             region = auto
             EOF
       - name: Lock QA config
-        run: bash ./scripts/acquire_lock.sh installer/qa-config/lockfile
+        run: bash ./scripts/acquire_lock.sh installer/qa-config/lockfile.txt
       - name: Update QA config entries
         id: update_config
         if: github.event.pull_request.auto_merge == false
@@ -53,4 +53,4 @@ jobs:
         if: always()
         run: |
           sleep 10
-          bash ./scripts/release_lock.sh installer/qa-config/lockfile
+          bash ./scripts/release_lock.sh installer/qa-config/lockfile.txt
