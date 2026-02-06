@@ -49,7 +49,7 @@ jobs:
             region = auto
             EOF
       - name: Lock QA config
-        run: ./scripts/acquire_lock.sh installer/qa-config/.lock
+        run: bash ./scripts/acquire_lock.sh installer/qa-config/.lock
       - name: Remove QA config entries
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -74,4 +74,4 @@ jobs:
         if: always()
         run: |
           sleep 10
-          ./scripts/release_lock.sh installer/qa-config/.lock
+          bash ./scripts/release_lock.sh installer/qa-config/.lock
