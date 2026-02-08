@@ -3,15 +3,21 @@ set -euo pipefail
 
 RCLONE_REMOTE="cloudflare-r2"
 R2_BUCKET="flybywiresim"
-LOCK="${1:-locks/test/.lock}"   # Use first argument, default if not provided
-OWNER="${GITHUB_RUN_ID}-${GITHUB_JOB}"
+LOCK="${1:-locks/test/.lock}"
 
-echo "🔓 Attempting to release lock at '$LOCK'..."
+OWNER="${GITHUB_RUN_ID:-local}-${GITHUB_JOB:-local}"
 
-# Only delete the lock if this job owns it
-if rclone cat $RCLONE_REMOTE:$R2_BUCKET/$LOCK | grep -q "^$OWNER "; then
-    rclone delete $RCLONE_REMOTE:$R2_BUCKET/$LOCK || true
+DIR="$(dirname "$LOCK")"
+FILE="$(basename "$LOCK")"
+LOCK_PATH="$RCLONE_REMOTE:$R2_BUCKET/$DIR/$FILE"
+
+echo "🔓 Attempting to release lock..."
+
+CONTENT="$(rclone cat "$LOCK_PATH" 2>/dev/null || true)"
+
+if grep -q "^$OWNER " <<< "$CONTENT"; then
+    rclone delete "$LOCK_PATH" || true
     echo "✅ Lock released"
 else
-    echo "⚠️ Lock not owned by this job, skipping release"
+    echo "⚠️ Lock not owned by this job, skipping"
 fi

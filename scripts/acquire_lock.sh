@@ -4,38 +4,47 @@ set -euo pipefail
 RCLONE_REMOTE="cloudflare-r2"
 R2_BUCKET="flybywiresim"
 LOCK="${1:-locks/test/.lock}"
+
 OWNER="${GITHUB_RUN_ID:-local}-${GITHUB_JOB:-local}"
 MAX_WAIT=1800
 STALE=3600
 SLEEP=10
 START=$(date +%s)
 
-LOCK_PATH="$RCLONE_REMOTE:$R2_BUCKET/$LOCK"
+DIR="$(dirname "$LOCK")"
+FILE="$(basename "$LOCK")"
+
+DIR_PATH="$RCLONE_REMOTE:$R2_BUCKET/$DIR"
+LOCK_PATH="$DIR_PATH/$FILE"
 
 echo "🔐 Attempting to acquire lock at '$LOCK_PATH'..."
 
 while true; do
-    if ! rclone cat "$LOCK_PATH" >/dev/null 2>&1; then
-        # Lock doesn't exist, create it
-        echo "$OWNER $(date +%s)" | rclone rcat "$LOCK_PATH"
+    # LIST DIRECTORY CONTENTS AND CHECK FOR FILE NAME
+    if ! rclone ls "$DIR_PATH" 2>/dev/null | awk '{print $2}' | grep -Fxq "$FILE"; then
+        # FILE DOES NOT EXIST → CREATE IT
+        echo "$OWNER $(date +%s)" > /tmp/lockfile
+        rclone copyto /tmp/lockfile "$LOCK_PATH"
         echo "✅ Lock acquired"
-        break
-    else
-        # Lock exists, check if stale
-        CONTENT=$(rclone cat "$LOCK_PATH")
-        LOCK_TIME=$(awk '{print $2}' <<< "$CONTENT")
+        exit 0
+    fi
+
+    # FILE EXISTS → READ IT
+    CONTENT="$(rclone cat "$LOCK_PATH" 2>/dev/null || true)"
+    LOCK_TIME="$(awk '{print $2}' <<< "$CONTENT")"
+
+    if [[ "$LOCK_TIME" =~ ^[0-9]+$ ]]; then
         NOW=$(date +%s)
         AGE=$((NOW - LOCK_TIME))
 
         if (( AGE > STALE )); then
-            echo "⚠️ Stale lock detected (age: $AGE s), deleting..."
+            echo "⚠️ Stale lock (age $AGE s), deleting..."
             rclone delete "$LOCK_PATH" || true
             continue
-        else
-            LOCK_OWNER=$(awk '{print $1}' <<< "$CONTENT")
-            echo "🔒 Lock held by $LOCK_OWNER (age: $AGE s), waiting..."
         fi
     fi
+
+    echo "🔒 Lock exists, waiting..."
 
     if (( $(date +%s) - START > MAX_WAIT )); then
         echo "❌ Timeout waiting for lock"
