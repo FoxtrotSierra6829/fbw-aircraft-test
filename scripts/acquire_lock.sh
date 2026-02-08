@@ -15,7 +15,7 @@ DIR="$(dirname "$LOCK")"
 FILE="$(basename "$LOCK")"
 
 DIR_PATH="$RCLONE_REMOTE:$R2_BUCKET/$DIR"
-LOCK_PATH="$DIR_PATH/$FILE"
+LOCK_PATH="$RCLONE_REMOTE:$R2_BUCKET/$LOCK"
 
 echo "🔐 Attempting to acquire lock at '$LOCK_PATH'..."
 
