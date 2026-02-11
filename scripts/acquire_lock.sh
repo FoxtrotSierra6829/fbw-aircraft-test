@@ -23,8 +23,16 @@ while true; do
     # LIST DIRECTORY CONTENTS AND CHECK FOR FILE NAME
     if ! rclone ls "$DIR_PATH" 2>/dev/null | awk '{print $2}' | grep -Fxq "$FILE"; then
         # FILE DOES NOT EXIST → CREATE IT
-        echo "$OWNER $(date +%s)" > /tmp/lockfile
-        rclone copyto /tmp/lockfile "$LOCK_PATH"
+        # Create a temporary directory structure
+        TEMP_DIR="/tmp/lock_upload"
+        mkdir -p "$TEMP_DIR"
+        echo "$OWNER $(date +%s)" > "$TEMP_DIR/$FILE"
+
+        # Use the same approach as cf-cdn.sh - copy directory
+        rclone copy "$TEMP_DIR" "$DIR_PATH"
+
+        # Cleanup
+        rm -rf "$TEMP_DIR"
         echo "✅ Lock acquired"
         exit 0
     fi
