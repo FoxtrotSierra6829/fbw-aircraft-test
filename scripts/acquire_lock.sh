@@ -33,8 +33,16 @@ while true; do
 
         # Cleanup
         rm -rf "$TEMP_DIR"
-        echo "✅ Lock acquired"
-        exit 0
+
+        # Verify we actually own the lock
+        CONTENT="$(rclone cat "$LOCK_PATH" 2>/dev/null || true)"
+        if grep -q "^$OWNER " <<< "$CONTENT"; then
+            echo "✅ Lock acquired and verified"
+            exit 0
+        else
+            echo "❌ Lock creation failed - not owner after upload"
+            exit 1
+        fi
     fi
 
     # FILE EXISTS → READ IT
