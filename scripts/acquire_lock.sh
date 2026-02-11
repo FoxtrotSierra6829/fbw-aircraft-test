@@ -34,14 +34,14 @@ while true; do
         # Cleanup
         rm -rf "$TEMP_DIR"
 
-        # Verify we actually own the lock
+        # Verify this workflow owns the lock
         CONTENT="$(rclone cat "$LOCK_PATH" 2>/dev/null || true)"
         if grep -q "^$OWNER " <<< "$CONTENT"; then
             echo "✅ Lock acquired and verified"
             exit 0
         else
-            echo "❌ Lock creation failed - not owner after upload"
-            exit 1
+            echo "⚠️ Race condition detected - another workflow acquired this lock, retrying..."
+            continue
         fi
     fi
 
@@ -67,5 +67,5 @@ while true; do
         exit 1
     fi
 
-    sleep $SLEEP
+    sleep $((SLEEP + RANDOM % 5))
 done
