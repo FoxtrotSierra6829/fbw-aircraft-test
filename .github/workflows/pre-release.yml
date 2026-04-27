@@ -28,7 +28,7 @@ jobs:
   build_a32nx:
     name: Build and publish A32NX
     # Prevent running this on forks
-    if: github.repository_owner == 'flybywiresim'
+    if: github.repository_owner == 'foxtrotsierra6829'
     permissions:
       contents: write
     needs: create_github_release
@@ -141,7 +141,7 @@ jobs:
   build_a380x_8k:
     name: Build and deploy A380X (8K)
     # Prevent running this on forks
-    if: github.repository_owner == 'flybywiresim'
+    if: github.repository_owner == 'foxtrotsierra6829'
     needs: create_github_release
     runs-on: ubuntu-latest
     permissions:
@@ -275,7 +275,7 @@ jobs:
   build_a380x_4k:
     name: Build and deploy A380X (4K)
     # Prevent running this on forks
-    if: github.repository_owner == 'flybywiresim'
+    if: github.repository_owner == 'foxtrotsierra6829'
     needs: create_github_release
     runs-on: ubuntu-latest
     permissions:
