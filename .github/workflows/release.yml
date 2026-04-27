@@ -29,13 +29,13 @@ jobs:
   build_a32nx:
     name: Build and publish A32NX
     # Prevent running this on forks
-    if: github.repository_owner == 'flybywiresim'
+    if: github.repository_owner == 'foxtrotsierra6829'
     needs: create_github_release
     runs-on: ubuntu-latest
     env:
       FBW_PRODUCTION_BUILD: 1
-      PRE_RELEASE_TAG: assets/stable
-      PRE_RELEASE_ID: 66067814
+      PRE_RELEASE_TAG: assets/msfs2024/stable
+      PRE_RELEASE_ID: 313976527
       STANDALONE_ZIP_NAME: A32NX-stable.7z
       BUILD_DIR_NAME: stable-a32nx
       AIRCRAFT_PROJECT_PREFIX: a32nx
