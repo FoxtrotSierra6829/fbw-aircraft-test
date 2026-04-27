@@ -34,8 +34,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FBW_PRODUCTION_BUILD: 1
-      PRE_RELEASE_TAG: assets/stable
-      PRE_RELEASE_ID: 66067814
+      PRE_RELEASE_TAG: assets/msfs2020/stable
+      PRE_RELEASE_ID: 313975969
       STANDALONE_ZIP_NAME: A32NX-stable.7z
       BUILD_DIR_NAME: stable-a32nx
       AIRCRAFT_PROJECT_PREFIX: a32nx
