@@ -5,7 +5,7 @@ name: master
 on:
   push:
     branches:
-      - master
+      - fs2024-master
 
 jobs:
   build_a32nx:
