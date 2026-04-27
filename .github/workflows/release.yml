@@ -172,8 +172,8 @@ jobs:
       contents: write
     env:
       FBW_PRODUCTION_BUILD: 1
-      PRE_RELEASE_TAG: assets/stable
-      PRE_RELEASE_ID: 66067814
+      PRE_RELEASE_TAG: assets/msfs2020/stable
+      PRE_RELEASE_ID: 313975969
       BUILD_DIR_NAME: stable-a380x
       AIRCRAFT_PROJECT_PREFIX: a380x
       STANDALONE_ZIP_NAME: A380X-stable-8K.7z
@@ -322,8 +322,8 @@ jobs:
       contents: write
     env:
       FBW_PRODUCTION_BUILD: 1
-      PRE_RELEASE_TAG: assets/stable
-      PRE_RELEASE_ID: 66067814
+      PRE_RELEASE_TAG: assets/msfs2020/stable
+      PRE_RELEASE_ID: 313975969
       BUILD_DIR_NAME: stable-a380x
       AIRCRAFT_PROJECT_PREFIX: a380x
       STANDALONE_ZIP_NAME: A380X-stable-4K.7z
