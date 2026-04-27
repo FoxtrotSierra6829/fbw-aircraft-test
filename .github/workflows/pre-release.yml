@@ -282,8 +282,6 @@ jobs:
       contents: write
     env:
       FBW_PRODUCTION_BUILD: 1
-      PRE_RELEASE_TAG: assets/stable
-      PRE_RELEASE_ID: 66067814
       BUILD_DIR_NAME: stable-a380x
       AIRCRAFT_PROJECT_PREFIX: a380x
       STANDALONE_ZIP_NAME: A380X-stable-rc-4K.7z
