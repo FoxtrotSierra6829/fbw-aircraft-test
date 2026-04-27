@@ -2,7 +2,7 @@ name: InGamePanels Checklist Fix
 on:
   push:
     branches:
-      - master
+      - fs2020-mmaster
     paths:
       - 'fbw-ingamepanels-checklist-fix/**'
       - 'scripts/build_ingamepanels_checklist_fix.js'
@@ -14,7 +14,7 @@ on:
 jobs:
   build-ingamepanels-checklist-fix:
     # Prevent running this on forks
-    if: github.repository_owner == 'flybywiresim'
+    if: github.repository_owner == 'foxtrotsierra6829'
     name: 'Build InGamePanels Checklist Fix'
     runs-on: ubuntu-latest
     permissions:
