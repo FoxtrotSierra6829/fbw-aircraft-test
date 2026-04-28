@@ -1,0 +1,30 @@
+name: PR Labels
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  label-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Simulator
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR="${{ github.event.pull_request.number }}"
+          BASE="${{ github.event.pull_request.base.ref }}"
+
+          LABELS=$(gh pr view "$PR" --json labels --jq '.labels[].name')
+
+          if [ "$BASE" = "master" ]; then
+            echo "$LABELS" | grep -qx "MSFS2020" && gh pr edit "$PR" --remove-label "MSFS2020"
+            echo "$LABELS" | grep -qx "MSFS2024" || gh pr edit "$PR" --add-label "MSFS2024"
+
+          elif [ "$BASE" = "fs2020-master" ]; then
+            echo "$LABELS" | grep -qx "MSFS2024" && gh pr edit "$PR" --remove-label "MSFS2024"
+            echo "$LABELS" | grep -qx "MSFS2020" || gh pr edit "$PR" --add-label "MSFS2020"
+          fi
