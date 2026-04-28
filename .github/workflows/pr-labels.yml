@@ -20,7 +20,7 @@ jobs:
 
           LABELS=$(gh pr view "$PR" --repo ${{ github.repository }} --json labels --jq '.labels[].name')
 
-          if [ "$BASE" = "master" ]; then
+          if [ "$BASE" = "fs2024-master" ]; then
             echo "$LABELS" | grep -qx "MSFS2020" && gh pr edit "$PR" --repo ${{ github.repository }} --remove-label "MSFS2020"
             echo "$LABELS" | grep -qx "MSFS2024" || gh pr edit "$PR" --repo ${{ github.repository }} --add-label "MSFS2024"
 
