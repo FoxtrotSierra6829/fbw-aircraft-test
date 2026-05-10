@@ -1,0 +1,45 @@
+name: Copy files on CDN to sim specific location
+on:
+  push:
+    branches:
+      - cdn-mover
+
+jobs:
+  move-stable:
+    runs-on: ubuntu-latest
+    name: copy stable
+    permissions:
+      contents: read
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y rclone
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Configure rclone for Cloudflare R2
+        run: |
+            mkdir -p ~/.config/rclone
+            cat > ~/.config/rclone/rclone.conf <<EOF
+            [cloudflare-r2]
+            type = s3
+            provider = Cloudflare
+            env_auth = false
+            access_key_id = ${{ secrets.CLOUDFLARE_R2_ACCESS_KEY_ID }}
+            secret_access_key = ${{ secrets.CLOUDFLARE_R2_SECRET_ACCESS_KEY }}
+            endpoint = ${{ secrets.CLOUDFLARE_R2_ENDPOINT }}
+            region = auto
+            EOF
+      - name: Copy stable versions
+        env:
+          RCLONE_REMOTE: cloudflare-r2
+          R2_BUCKET: flybywiresim
+        run: |
+          rclone copy "$RCLONE_REMOTE:$R2_BUCKET/addons/a32nx/stable" "$RCLONE_REMOTE:$R2_BUCKET/addons/msfs2020/a32nx/stable" --progress
+          rclone copy "$RCLONE_REMOTE:$R2_BUCKET/addons/a380x/stable-4k" "$RCLONE_REMOTE:$R2_BUCKET/addons/msfs2020/a380x/stable-4k" --progress
+          rclone copy "$RCLONE_REMOTE:$R2_BUCKET/addons/a380x/stable-8k" "$RCLONE_REMOTE:$R2_BUCKET/addons/msfs2020/a380x/stable-8k" --progress
+          rclone copy "$RCLONE_REMOTE:$R2_BUCKET/addons/a32nx/stable" "$RCLONE_REMOTE:$R2_BUCKET/addons/msfs2024/a32nx/stable" --progress
+          rclone copy "$RCLONE_REMOTE:$R2_BUCKET/addons/a380x/stable-4k" "$RCLONE_REMOTE:$R2_BUCKET/addons/msfs2024/a380x/stable-4k" --progress
+          rclone copy "$RCLONE_REMOTE:$R2_BUCKET/addons/a380x/stable-8k" "$RCLONE_REMOTE:$R2_BUCKET/addons/msfs2024/a380x/stable-8k" --progress
+
