@@ -33,7 +33,7 @@ jobs:
             EOF
       - name: Lock QA config
         if: github.event.pull_request.auto_merge == false
-        run: ./scripts/acquire_lock.sh installer/qa-config/.lock
+        run: ./scripts/acquire_lock.sh installer/test/.lock
       - name: Update QA config entries
         id: update_config
         if: github.event.pull_request.auto_merge == false
@@ -48,8 +48,10 @@ jobs:
         env:
           CLOUDFLARE_CDN_ZONE_ID: ${{ secrets.CLOUDFLARE_CDN_ZONE_ID }}
           CLOUDFLARE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
-          CDN_BUCKET_DESTINATION: installer/qa-config/
+          CDN_BUCKET_DESTINATION: installer/test/
+          QA_CONFIG_URL: https://flybywirecdn.com/installer/test/pull-requests.json
+          GITHUB_REPO: foxtrotsierra6829/fbw-aircraft-test
         run: ./scripts/cf-cdn.sh ./qa-config $CDN_BUCKET_DESTINATION
       - name: Release QA config lock
         if: always()
-        run: ./scripts/release_lock.sh installer/qa-config/.lock
+        run: ./scripts/release_lock.sh installer/test/.lock
