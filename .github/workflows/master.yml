@@ -5,20 +5,20 @@ name: master
 on:
   push:
     branches:
-      - master
+      - fs2024-master
 
 jobs:
   build_a32nx:
     name: Build and deploy A32NX
     # Prevent running this on forks
-    if: github.repository_owner == 'flybywiresim'
+    if: github.repository_owner == 'foxtrotsierra6829'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     env:
       FBW_PRODUCTION_BUILD: 1
       PRE_RELEASE_TAG: assets/msfs2024/master
-      PRE_RELEASE_ID: 313832813
+      PRE_RELEASE_ID: 313976304
       STANDALONE_ZIP_NAME: A32NX-master.7z
       BUILD_DIR_NAME: master-a32nx
       AIRCRAFT_PROJECT_PREFIX: a32nx
@@ -91,7 +91,7 @@ jobs:
         env:
           CLOUDFLARE_CDN_ZONE_ID: ${{ secrets.CLOUDFLARE_CDN_ZONE_ID }}
           CLOUDFLARE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
-          CDN_BUCKET_DESTINATION: addons/msfs2024/a32nx/master
+          CDN_BUCKET_DESTINATION: addons/msfs2024/test/a32nx/master
         run: |
           ./scripts/cf-cdn.sh ./fbw-a32nx/out/build-modules $CDN_BUCKET_DESTINATION
       - name: Build Standalone Download files
@@ -143,14 +143,14 @@ jobs:
   build_a380x:
     name: Build and deploy A380X
     # Prevent running this on forks
-    if: github.repository_owner == 'flybywiresim'
+    if: github.repository_owner == 'foxtrotsierra6829'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     env:
       FBW_PRODUCTION_BUILD: 1
       PRE_RELEASE_TAG: assets/msfs2024/master
-      PRE_RELEASE_ID: 313832813
+      PRE_RELEASE_ID: 313976304
       BUILD_DIR_NAME: master-a380x
       AIRCRAFT_PROJECT_PREFIX: a380x
       STANDALONE_ZIP_NAME: A380X-master.7z
@@ -244,7 +244,7 @@ jobs:
         env:
           CLOUDFLARE_CDN_ZONE_ID: ${{ secrets.CLOUDFLARE_CDN_ZONE_ID }}
           CLOUDFLARE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
-          CDN_BUCKET_DESTINATION: addons/msfs2024/a380x/master
+          CDN_BUCKET_DESTINATION: addons/msfs2024/test/a380x/master
         run: |
           ./scripts/cf-cdn.sh ./fbw-a380x/out/build-modules $CDN_BUCKET_DESTINATION
       - name: Build Standalone Download files

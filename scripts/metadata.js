@@ -14,7 +14,7 @@ const getBranchPreFix = () => {
   if (edition === 'stable') {
     return 'rel';
   }
-  if (buildInfo?.branch === 'master') {
+  if (buildInfo?.branch === 'fs2024-master') {
     return 'dev';
   }
   if (buildInfo?.branch === 'experimental') {
