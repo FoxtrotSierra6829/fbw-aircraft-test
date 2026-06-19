@@ -12,6 +12,7 @@
 
 ## 2024.2.0
 
+1. [TEST] Test - @test
 1. [ATSU] Add support for BeyondATC and SayIntentions AI as METAR/ATIS sources - @saschl
 1. [A32NX/TCAS] Improve PFD Resolution Advisory graphics, introduce TCAS bus - @lukecologne (luke)
 1. [A380X] Update aircraft to MSFS2024 native modular aircraft - @heclak (Heclak)
